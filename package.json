@@ -2,6 +2,7 @@
   "name": "@prisma-fmt/prisma-fmt",
   "version": "1.0.0",
   "description": "",
+  "private": true,
   "scripts": {
     "build": "npm run build --workspaces",
     "lint": "eslint --ext .ts packages",
