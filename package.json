@@ -1,0 +1,36 @@
+{
+  "name": "@prisma-fmt/prisma-fmt",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "lint": "eslint --ext .ts packages",
+    "test": "jest --ci --reporters=default --reporters=jest-junit --coverage",
+    "changeset": "changeset"
+  },
+  "keywords": [],
+  "workspaces": [
+    "packages/*"
+  ],
+  "homepage": "https://github.com/joshuaavalon/prisma-fmt#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/joshuaavalon/prisma-fmt.git"
+  },
+  "bugs": {
+    "url": "https://github.com/joshuaavalon/prisma-fmt/issues"
+  },
+  "author": "Joshua Avalon",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@changesets/cli": "^2.17.0",
+    "@joshuaavalon/eslint-config-typescript": "^5.0.0",
+    "@types/jest": "^27.0.2",
+    "eslint": "^8.0.0",
+    "jest": "^27.2.4",
+    "jest-junit": "^13.0.0",
+    "prettier": "^2.4.1",
+    "rimraf": "^3.0.2",
+    "typescript": "^4.1.3"
+  }
+}

@@ -1,0 +1,361 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Album {
+  id                                           String           @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  nameId                                       String           @unique @map("name_id") @db.Uuid
+  nameSortId                                   String           @unique @map("name_sort_id") @db.Uuid
+  rating                                       Decimal?         @db.Decimal(3, 1)
+  descriptionId                                String           @unique @map("description_id") @db.Uuid
+  releaseDate                                  DateTime?        @map("release_date") @db.Date
+  personId                                     String           @map("person_id") @db.Uuid
+  createdAt                                    DateTime         @default(now()) @map("created_at") @db.Timestamp(6)
+  multilingualAlbumDescriptionIdTomultilingual Multilingual     @relation("albumDescriptionIdTomultilingual", fields: [descriptionId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  multilingualAlbumNameIdTomultilingual        Multilingual     @relation("albumNameIdTomultilingual", fields: [nameId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  multilingualAlbumNameSortIdTomultilingual    Multilingual     @relation("albumNameSortIdTomultilingual", fields: [nameSortId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  person                                       Person           @relation(fields: [personId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  albumAttachment                              AlbumAttachment?
+  track                                        Track[]
+
+  @@map("album")
+}
+
+model AlbumAttachment {
+  id        String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  albumId   String   @unique @map("album_id") @db.Uuid
+  uploaded  Boolean? @default(false)
+  variant   String
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+  album     Album    @relation(fields: [albumId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("album_attachment")
+}
+
+model Collection {
+  id                                                String                @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  nameId                                            String                @unique @map("name_id") @db.Uuid
+  descriptionId                                     String                @map("description_id") @db.Uuid
+  createdAt                                         DateTime              @default(now()) @map("created_at") @db.Timestamp(6)
+  multilingualCollectionDescriptionIdTomultilingual Multilingual          @relation("collectionDescriptionIdTomultilingual", fields: [descriptionId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  multilingualCollectionNameIdTomultilingual        Multilingual          @relation("collectionNameIdTomultilingual", fields: [nameId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  collectionAttachment                              CollectionAttachment?
+
+  @@map("collection")
+}
+
+model CollectionAttachment {
+  id           String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  collectionId String     @unique @map("collection_id") @db.Uuid
+  uploaded     Boolean?   @default(false)
+  variant      String
+  createdAt    DateTime   @default(now()) @map("created_at") @db.Timestamp(6)
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("collection_attachment")
+}
+
+model Country {
+  id           String       @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  code         String       @unique
+  nameId       String       @unique @map("name_id") @db.Uuid
+  createdAt    DateTime     @default(now()) @map("created_at") @db.Timestamp(6)
+  multilingual Multilingual @relation(fields: [nameId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("country")
+}
+
+model Episode {
+  id                                             String             @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  nameId                                         String             @unique @map("name_id") @db.Uuid
+  nameSortId                                     String             @unique @map("name_sort_id") @db.Uuid
+  contentRating                                  String             @map("content_rating")
+  aired                                          DateTime?          @db.Date
+  rating                                         Decimal?           @db.Decimal(3, 1)
+  descriptionId                                  String             @unique @map("description_id") @db.Uuid
+  seasonId                                       String             @map("season_id") @db.Uuid
+  episodeNo                                      Int                @map("episode_no")
+  createdAt                                      DateTime           @default(now()) @map("created_at") @db.Timestamp(6)
+  multilingualEpisodeDescriptionIdTomultilingual Multilingual       @relation("episodeDescriptionIdTomultilingual", fields: [descriptionId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  multilingualEpisodeNameIdTomultilingual        Multilingual       @relation("episodeNameIdTomultilingual", fields: [nameId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  multilingualEpisodeNameSortIdTomultilingual    Multilingual       @relation("episodeNameSortIdTomultilingual", fields: [nameSortId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  showSeason                                     ShowSeason         @relation(fields: [seasonId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  episodeAttachment                              EpisodeAttachment?
+
+  @@unique([seasonId, episodeNo])
+  @@map("episode")
+}
+
+model EpisodeAttachment {
+  id        String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  episodeId String   @unique @map("episode_id") @db.Uuid
+  uploaded  Boolean? @default(false)
+  variant   String
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+  episode   Episode  @relation(fields: [episodeId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("episode_attachment")
+}
+
+model FlywaySchemaHistory {
+  installedRank Int      @id(map: "flyway_schema_history_pk") @map("installed_rank")
+  version       String?  @db.VarChar(50)
+  description   String   @db.VarChar(200)
+  type          String   @db.VarChar(20)
+  script        String   @db.VarChar(1000)
+  checksum      Int?
+  installedBy   String   @map("installed_by") @db.VarChar(100)
+  installedOn   DateTime @default(now()) @map("installed_on") @db.Timestamp(6)
+  executionTime Int      @map("execution_time")
+  success       Boolean
+
+  @@index([success], map: "flyway_schema_history_s_idx")
+  @@map("flyway_schema_history")
+}
+
+model Genre {
+  id           String       @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  nameId       String       @unique @map("name_id") @db.Uuid
+  createdAt    DateTime     @default(now()) @map("created_at") @db.Timestamp(6)
+  multilingual Multilingual @relation(fields: [nameId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("genre")
+}
+
+model Language {
+  id           String         @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name         String         @unique
+  iso          String         @unique
+  multilingual Multilingual[]
+  text         Text?
+
+  @@map("language")
+}
+
+model Mood {
+  id                                          String       @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  nameId                                      String       @unique @map("name_id") @db.Uuid
+  descriptionId                               String       @unique @map("description_id") @db.Uuid
+  multilingualMoodDescriptionIdTomultilingual Multilingual @relation("moodDescriptionIdTomultilingual", fields: [descriptionId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  multilingualMoodNameIdTomultilingual        Multilingual @relation("moodNameIdTomultilingual", fields: [nameId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("mood")
+}
+
+model Movie {
+  id                                           String           @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  nameId                                       String           @unique @map("name_id") @db.Uuid
+  nameSortId                                   String           @unique @map("name_sort_id") @db.Uuid
+  contentRating                                String           @map("content_rating")
+  aired                                        DateTime?        @db.Date
+  taglineId                                    String           @unique @map("tagline_id") @db.Uuid
+  rating                                       Decimal?         @db.Decimal(3, 1)
+  descriptionId                                String           @unique @map("description_id") @db.Uuid
+  createdAt                                    DateTime         @default(now()) @map("created_at") @db.Timestamp(6)
+  multilingualMovieDescriptionIdTomultilingual Multilingual     @relation("movieDescriptionIdTomultilingual", fields: [descriptionId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  multilingualMovieNameIdTomultilingual        Multilingual     @relation("movieNameIdTomultilingual", fields: [nameId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  multilingualMovieNameSortIdTomultilingual    Multilingual     @relation("movieNameSortIdTomultilingual", fields: [nameSortId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  multilingualMovieTaglineIdTomultilingual     Multilingual     @relation("movieTaglineIdTomultilingual", fields: [taglineId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  movieAttachment                              MovieAttachment?
+
+  @@map("movie")
+}
+
+model MovieAttachment {
+  id        String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  movieId   String   @unique @map("movie_id") @db.Uuid
+  uploaded  Boolean? @default(false)
+  variant   String
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+  movie     Movie    @relation(fields: [movieId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("movie_attachment")
+}
+
+model Multilingual {
+  id                                              String       @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  defaultLanguageId                               String       @map("default_language_id") @db.Uuid
+  language                                        Language     @relation(fields: [defaultLanguageId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  albumAlbumDescriptionIdTomultilingual           Album?       @relation("albumDescriptionIdTomultilingual")
+  albumAlbumNameIdTomultilingual                  Album?       @relation("albumNameIdTomultilingual")
+  albumAlbumNameSortIdTomultilingual              Album?       @relation("albumNameSortIdTomultilingual")
+  collectionCollectionDescriptionIdTomultilingual Collection[] @relation("collectionDescriptionIdTomultilingual")
+  collectionCollectionNameIdTomultilingual        Collection?  @relation("collectionNameIdTomultilingual")
+  country                                         Country?
+  episodeEpisodeDescriptionIdTomultilingual       Episode?     @relation("episodeDescriptionIdTomultilingual")
+  episodeEpisodeNameIdTomultilingual              Episode?     @relation("episodeNameIdTomultilingual")
+  episodeEpisodeNameSortIdTomultilingual          Episode?     @relation("episodeNameSortIdTomultilingual")
+  genre                                           Genre?
+  moodMoodDescriptionIdTomultilingual             Mood?        @relation("moodDescriptionIdTomultilingual")
+  moodMoodNameIdTomultilingual                    Mood?        @relation("moodNameIdTomultilingual")
+  movieMovieDescriptionIdTomultilingual           Movie?       @relation("movieDescriptionIdTomultilingual")
+  movieMovieNameIdTomultilingual                  Movie?       @relation("movieNameIdTomultilingual")
+  movieMovieNameSortIdTomultilingual              Movie?       @relation("movieNameSortIdTomultilingual")
+  movieMovieTaglineIdTomultilingual               Movie?       @relation("movieTaglineIdTomultilingual")
+  personMultilingualTopersonDescriptionId         Person?      @relation("multilingualTopersonDescriptionId")
+  personMultilingualTopersonNameId                Person?      @relation("multilingualTopersonNameId")
+  personMultilingualTopersonNameSortId            Person?      @relation("multilingualTopersonNameSortId")
+  showMultilingualToshowDescriptionId             Show?        @relation("multilingualToshowDescriptionId")
+  showMultilingualToshowNameId                    Show?        @relation("multilingualToshowNameId")
+  showMultilingualToshowNameSortId                Show?        @relation("multilingualToshowNameSortId")
+  showMultilingualToshowTaglineId                 Show?        @relation("multilingualToshowTaglineId")
+  showSeasonMultilingualToshowSeasonDescriptionId ShowSeason?  @relation("multilingualToshowSeasonDescriptionId")
+  showSeasonMultilingualToshowSeasonNameId        ShowSeason?  @relation("multilingualToshowSeasonNameId")
+  studioMultilingualTostudioDescriptionId         Studio?      @relation("multilingualTostudioDescriptionId")
+  studioMultilingualTostudioNameId                Studio?      @relation("multilingualTostudioNameId")
+  styleMultilingualTostyleDescriptionId           Style?       @relation("multilingualTostyleDescriptionId")
+  styleMultilingualTostyleNameId                  Style?       @relation("multilingualTostyleNameId")
+  text                                            Text?
+  trackMultilingualTotrackDescriptionId           Track?       @relation("multilingualTotrackDescriptionId")
+  trackMultilingualTotrackNameId                  Track?       @relation("multilingualTotrackNameId")
+  trackMultilingualTotrackNameSortId              Track?       @relation("multilingualTotrackNameSortId")
+
+  @@map("multilingual")
+}
+
+model Person {
+  id                                            String            @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  nameId                                        String            @unique @map("name_id") @db.Uuid
+  nameSortId                                    String            @unique @map("name_sort_id") @db.Uuid
+  descriptionId                                 String            @unique @map("description_id") @db.Uuid
+  createdAt                                     DateTime          @default(now()) @map("created_at") @db.Timestamp(6)
+  multilingualMultilingualTopersonDescriptionId Multilingual      @relation("multilingualTopersonDescriptionId", fields: [descriptionId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  multilingualMultilingualTopersonNameId        Multilingual      @relation("multilingualTopersonNameId", fields: [nameId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  multilingualMultilingualTopersonNameSortId    Multilingual      @relation("multilingualTopersonNameSortId", fields: [nameSortId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  album                                         Album[]
+  personAttachment                              PersonAttachment?
+  personB                                       Person[]          @relation("personSimilar")
+  personA                                       Person[]          @relation("personSimilar")
+
+  @@map("person")
+}
+
+model PersonAttachment {
+  id        String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  personId  String   @unique @map("person_id") @db.Uuid
+  uploaded  Boolean? @default(false)
+  variant   String
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+  person    Person   @relation(fields: [personId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("person_attachment")
+}
+
+model Show {
+  id                                          String          @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  nameId                                      String          @unique @map("name_id") @db.Uuid
+  nameSortId                                  String          @unique @map("name_sort_id") @db.Uuid
+  contentRating                               String          @map("content_rating")
+  aired                                       DateTime?       @db.Date
+  taglineId                                   String          @unique @map("tagline_id") @db.Uuid
+  rating                                      Decimal?        @db.Decimal(3, 1)
+  descriptionId                               String          @unique @map("description_id") @db.Uuid
+  createdAt                                   DateTime        @default(now()) @map("created_at") @db.Timestamp(6)
+  multilingualMultilingualToshowDescriptionId Multilingual    @relation("multilingualToshowDescriptionId", fields: [descriptionId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  multilingualMultilingualToshowNameId        Multilingual    @relation("multilingualToshowNameId", fields: [nameId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  multilingualMultilingualToshowNameSortId    Multilingual    @relation("multilingualToshowNameSortId", fields: [nameSortId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  multilingualMultilingualToshowTaglineId     Multilingual    @relation("multilingualToshowTaglineId", fields: [taglineId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  showAttachment                              ShowAttachment?
+  showSeason                                  ShowSeason[]
+
+  @@map("show")
+}
+
+model ShowAttachment {
+  id        String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  showId    String   @unique @map("show_id") @db.Uuid
+  uploaded  Boolean? @default(false)
+  variant   String
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+  show      Show     @relation(fields: [showId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("show_attachment")
+}
+
+model ShowSeason {
+  id                                                String       @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  showId                                            String       @map("show_id") @db.Uuid
+  nameId                                            String       @unique @map("name_id") @db.Uuid
+  seasonNo                                          Int          @map("season_no")
+  descriptionId                                     String       @unique @map("description_id") @db.Uuid
+  multilingualMultilingualToshowSeasonDescriptionId Multilingual @relation("multilingualToshowSeasonDescriptionId", fields: [descriptionId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  multilingualMultilingualToshowSeasonNameId        Multilingual @relation("multilingualToshowSeasonNameId", fields: [nameId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  show                                              Show         @relation(fields: [showId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  episode                                           Episode[]
+
+  @@unique([showId, seasonNo])
+  @@map("show_season")
+}
+
+model Studio {
+  id                                            String       @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  nameId                                        String       @unique @map("name_id") @db.Uuid
+  descriptionId                                 String       @unique @map("description_id") @db.Uuid
+  multilingualMultilingualTostudioDescriptionId Multilingual @relation("multilingualTostudioDescriptionId", fields: [descriptionId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  multilingualMultilingualTostudioNameId        Multilingual @relation("multilingualTostudioNameId", fields: [nameId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("studio")
+}
+
+model Style {
+  id                                           String       @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  nameId                                       String       @unique @map("name_id") @db.Uuid
+  descriptionId                                String       @unique @map("description_id") @db.Uuid
+  multilingualMultilingualTostyleDescriptionId Multilingual @relation("multilingualTostyleDescriptionId", fields: [descriptionId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  multilingualMultilingualTostyleNameId        Multilingual @relation("multilingualTostyleNameId", fields: [nameId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("style")
+}
+
+model Text {
+  id             String       @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  content        String
+  multilingualId String       @unique @map("multilingual_id") @db.Uuid
+  languageId     String       @unique @map("language_id") @db.Uuid
+  language       Language     @relation(fields: [languageId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  multilingual   Multilingual @relation(fields: [multilingualId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([multilingualId, languageId])
+  @@map("text")
+}
+
+model Track {
+  id                                           String           @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  nameId                                       String           @unique @map("name_id") @db.Uuid
+  nameSortId                                   String           @unique @map("name_sort_id") @db.Uuid
+  descriptionId                                String           @unique @map("description_id") @db.Uuid
+  albumId                                      String           @map("album_id") @db.Uuid
+  rating                                       Decimal?         @db.Decimal(3, 1)
+  createdAt                                    DateTime         @default(now()) @map("created_at") @db.Timestamp(6)
+  album                                        Album            @relation(fields: [albumId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  multilingualMultilingualTotrackDescriptionId Multilingual     @relation("multilingualTotrackDescriptionId", fields: [descriptionId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  multilingualMultilingualTotrackNameId        Multilingual     @relation("multilingualTotrackNameId", fields: [nameId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  multilingualMultilingualTotrackNameSortId    Multilingual     @relation("multilingualTotrackNameSortId", fields: [nameSortId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  trackAttachment                              TrackAttachment?
+
+  @@map("track")
+}
+
+model TrackAttachment {
+  id        String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  trackId   String   @unique @map("track_id") @db.Uuid
+  uploaded  Boolean? @default(false)
+  variant   String
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+  track     Track    @relation(fields: [trackId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("track_attachment")
+}
+
+model Version {
+  id        BigInt   @id @default(autoincrement())
+  version   String
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+
+  @@map("version")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}

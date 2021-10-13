@@ -1,0 +1,42 @@
+{
+  "name": "@prisma-fmt/cli",
+  "version": "1.0.0",
+  "description": "",
+  "private": true,
+  "main": "./lib/index.js",
+  "typings": "./src/index.ts",
+  "scripts": {
+    "prebuild": "rimraf lib",
+    "build": "tsc",
+    "pfmt": "pfmt"
+  },
+  "keywords": [],
+  "homepage": "https://github.com/joshuaavalon/prisma-fmt#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/joshuaavalon/prisma-fmt.git",
+    "directory": "packages/cli"
+  },
+  "bugs": {
+    "url": "https://github.com/joshuaavalon/prisma-fmt/issues"
+  },
+  "bin": {
+    "pfmt": "./bin.js"
+  },
+  "files": [
+    "lib",
+    "bin.js"
+  ],
+  "author": "Joshua Avalon",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@prisma-fmt/fmt": "^1.0.0",
+    "@prisma/sdk": "^3.2.1",
+    "change-case": "^4.1.2",
+    "yargs": "^17.2.1"
+  },
+  "devDependencies": {
+    "@types/node": "^16.10.3",
+    "@types/yargs": "^17.0.3"
+  }
+}
