@@ -6,7 +6,8 @@
     "build": "npm run build --workspaces",
     "lint": "eslint --ext .ts packages",
     "test": "jest --ci --reporters=default --reporters=jest-junit --coverage",
-    "changeset": "changeset"
+    "changeset": "changeset",
+    "publish": "changeset publish"
   },
   "keywords": [],
   "workspaces": [
