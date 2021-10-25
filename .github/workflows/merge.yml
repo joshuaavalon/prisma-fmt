@@ -25,5 +25,7 @@ jobs:
       - name: run build
         run: npm run build
       - uses: changesets/action@master
+        with:
+          version: changeset version && npm i
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
