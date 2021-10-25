@@ -1,6 +1,6 @@
 {
   "name": "@prisma-fmt/cli",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "",
   "main": "./lib/index.js",
   "typings": "./src/index.ts",
@@ -29,7 +29,7 @@
   "author": "Joshua Avalon",
   "license": "Apache-2.0",
   "dependencies": {
-    "@prisma-fmt/fmt": "^1.0.0",
+    "@prisma-fmt/fmt": "^1.1.0",
     "@prisma/sdk": "^3.2.1",
     "change-case": "^4.1.2",
     "yargs": "^17.2.1"
