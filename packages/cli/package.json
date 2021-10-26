@@ -30,11 +30,13 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@prisma-fmt/fmt": "^1.1.0",
-    "@prisma/sdk": "^3.2.1",
     "change-case": "^4.1.2",
     "yargs": "^17.2.1"
   },
   "devDependencies": {
     "@types/yargs": "^17.0.3"
+  },
+  "peerDependencies": {
+    "@prisma/sdk": "^3.0.0"
   }
 }
