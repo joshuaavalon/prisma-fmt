@@ -1,5 +1,11 @@
 # @prisma-fmt/fmt
 
+## 1.1.2
+
+### Patch Changes
+
+- 9d7087b: fix relation generated name without qoute
+
 ## 1.1.1
 
 ### Patch Changes
