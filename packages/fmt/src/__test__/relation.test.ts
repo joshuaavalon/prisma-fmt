@@ -39,7 +39,7 @@ describe("data-source", () => {
         field: i => i.toUpperCase()
       })
     );
-    expect(relation2.name).toBe("NAME");
+    expect(relation2.name).toBe("name");
     expect(relation2.attributes.fields).toBe("[NAME_ID]");
     expect(relation2.attributes.references).toBe("[ID]");
     expect(relation2.attributes.onDelete).toBe("Cascade");

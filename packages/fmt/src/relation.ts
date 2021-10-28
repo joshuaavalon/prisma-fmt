@@ -54,7 +54,7 @@ export class Relation implements Line {
 
     let result = "@relation(";
     if (this.name) {
-      result += this.name;
+      result += `"${this.name}"`;
     }
     const attrs = Object.entries(this.attributes);
 
